@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div>
+        <button onclick="login()">登入</button>
+        <button onclick="callCreate()">新增</button>
+        <button onclick="callModify()">修改</button>
+        <button onclick="callRemove()">刪除</button>
+        <button onclick="callFindById()">查詢1筆</button>
+        <button onclick="callFind()">查詢多筆</button>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script>
+        const token = "eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJpc3BhbiIsInN1YiI6IntcImN1c3RpZFwiOlwiQWxleFwiLFwiYmlydGhcIjpcIjIwMDEtMDAtMjBcIixcImVtYWlsXCI6XCJhbGV4QGxhYi5jb21cIn0iLCJleHAiOjE3NjE3OTE1NTksImlhdCI6MTc2MTc5MDk1OX0.oiv27KTKtie9B-HCgXBVDkC_lj4XWTO4OBWNx3mv_HIFnA6AvQNXnCbv_FSbt89QWjT9-Sy1ugf2z0RHwwHy1g";
+        function login() {
+            console.log("login-登入");
+            const request = {
+                "username": "Alex",
+                "password": "A"
+            };
+            axios.post("http://localhost:8080/ajax/secure/login", request).then(
+                function (response) {
+                    console.log("response", response);
+                }).catch(function (error) { console.log("error", error); })
+        }
+        function callCreate() {
+            console.log("callCreate-新增");
+
+        }
+        async function callModify() {
+            console.log("callModify-修改");
+            const request = {
+                "id": 10,
+                "name": "HotDog",
+                "price": 25.0,
+                "make": "2025-10-30",
+                "expire": 7
+            };
+            try {
+                const response = await axios.put("http://localhost:8080/ajax/pages/products/10", request, {
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
+                });
+                console.log("response", response);
+                if (response.data.success) {
+                    Swal.fire({
+                        text: response.data.message,
+                        icon: 'success',
+                    });
+                } else {
+                    Swal.fire({
+                        text: response.data.message,
+                        icon: 'warning',
+                    });
+                }
+            } catch (error) {
+                console.log("error", error);
+                Swal.fire({
+                    text: "執行錯誤：" + error.message,
+                    icon: 'error',
+                });
+            };
+        }
+        async function callRemove() {
+            console.log("callRemove-刪除");
+            const result = await Swal.fire({
+                text: "確定?",
+                icon: "question",
+                showDenyButton: true,
+            });
+            if (result.isConfirmed) {
+
+                try {
+                    const response = await axios.delete("http://localhost:8080/ajax/pages/products/10", request, {
+                        headers: {
+                            "Authorization": `Bearer ${token}`
+                        }
+                    });
+                    console.log("response", response);
+                    if (response.data.success) {
+                        Swal.fire({
+                            text: response.data.message,
+                            icon: 'success',
+                        });
+                    } else {
+                        Swal.fire({
+                            text: response.data.message,
+                            icon: 'warning',
+                        });
+                    }
+                } catch (error) {
+                    console.log("error", error);
+                    Swal.fire({
+                        text: "執行錯誤：" + error.message,
+                        icon: 'error',
+                    });
+                }
+            }
+        }
+        async function callFindById() {
+            console.log("callFindById-查詢1筆");
+            try {
+                const response = await axios.get("http://localhost:8080/ajax/pages/products/2", {
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
+                });
+                console.log("response", response);
+            } catch (error) {
+                console.log("error", error);
+                Swal.fire({
+                    text: "執行錯誤：" + error.message,
+                    icon: 'error',
+                });
+            };
+        }
+        function callFind() {
+            // console.log("callFind-查詢多筆");
+
+            Swal.fire({
+                title: "正在處理中........",
+                showConfirmButton: false,
+                allowOutsideClick: false,
+            });
+            const request = {
+                "start": 0,
+                "rows": 10,
+                "sort": "id",
+                "dir": false
+            };
+            axios.post("http://localhost:8080/ajax/pages/products/find", request, {
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            }).then(function (response) {
+                console.log("response", response);
+                setTimeout(function () {
+                    Swal.close();
+                }, 500);
+            }).catch(function (error) {
+                console.log("error", error);
+                Swal.fire({
+                    text: "執行錯誤：" + error.message,
+                    icon: 'error',
+                });
+            });
+        }
+    </script>
+
+</body>
+
+</html>
