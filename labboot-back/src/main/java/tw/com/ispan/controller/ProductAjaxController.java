@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import tw.com.ispan.domain.ProductBean;
@@ -20,11 +21,12 @@ import tw.com.ispan.service.ProductService;
 import tw.com.ispan.util.DatetimeConverter;
 
 @RestController
+@RequestMapping("/ajax/pages/products")
 public class ProductAjaxController {
     @Autowired
     private ProductService productService;
     
-    @PostMapping("/ajax/pages/products/find")
+    @PostMapping("/find")
     public ProductResponse find(@RequestBody String json) {
         long count = productService.count(json);
         List<ProductBean> products = productService.find(json);
@@ -35,7 +37,7 @@ public class ProductAjaxController {
         }
     }
 
-    @GetMapping("/ajax/pages/products/{id}")
+    @GetMapping("/{id}")
     public String findById(@PathVariable Integer id) {
         JSONObject response = new JSONObject();
         JSONArray array = new JSONArray();
@@ -56,7 +58,7 @@ public class ProductAjaxController {
         return response.toString();
     }
 
-    @DeleteMapping("/ajax/pages/products/{id}")
+    @DeleteMapping("/{id}")
     public ProductResponse remove(@PathVariable Integer id) {
         if(id==null) {
             return new ProductResponse("id是必要欄位", false, null, null);
@@ -71,7 +73,7 @@ public class ProductAjaxController {
         }
     }
 
-    @PutMapping("/ajax/pages/products/{id}")
+    @PutMapping("/{id}")
     public ProductResponse modify(@PathVariable Integer id, @RequestBody String json) {
         if(id==null) {
             return new ProductResponse("id是必要欄位", false, null, null);
@@ -87,7 +89,7 @@ public class ProductAjaxController {
         }
     }
 
-    @PostMapping("/ajax/pages/products")
+    @PostMapping
     public ProductResponse create(@RequestBody String json) {
         JSONObject obj = new JSONObject(json);
         Integer id = obj.isNull("id") ? null : obj.getInt("id");
